@@ -15,6 +15,8 @@ import pyjokes
 from urllib.request import urlopen
 import json
 from ecapture import ecapture as ec
+import requests
+import getpass
 
 def say(text):
     text_to_speech = pyttsx3.init()
@@ -101,9 +103,7 @@ if __name__ == '__main__':
                 say(f"Opening {site[0]}")
                 webbrowser.open(site[1])
                 # say(query)
-        if "open music" in query:
-            musicPath = 'C:\\Users\\Priyanshu\\Downloads\\prop-plane-14513.mp3'
-            os.system(f"open {musicPath}")
+        
 
         if "the time" in query:
             strftime=datetime.datetime.now().strftime("%H:%M:%S") 
@@ -167,8 +167,26 @@ if __name__ == '__main__':
         if "who are you" in query:
             say("I am your virtual assistant created by Tyflon")
 
-        
+        if "will you be my girlfriend" in query or "will you be my boyfriend" in query:  
+            say("I'm not sure about , may be you should give me some time")
 
+        if "how are you" in query:
+            say("I'm fine, glad you asked me that")
+
+        if "i love you".lower() in query:
+            say("It's hard to understand")
+
+        if "open Gmail" in query:
+            webbrowser.open("https://mail.google.com/mail/u/0/#inbox")
+        
+        if "where is" in query:
+            query=query.replace("where is","")
+            location = query
+            say("Locating ")
+            say(location)
+            webbrowser.open("https://www.google.nl/maps/place/" + location + "")
+
+        
         if "bye" in query:
             print("Adios amigose")
             say("Adios amigose")
