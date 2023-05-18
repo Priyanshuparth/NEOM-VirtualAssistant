@@ -73,4 +73,20 @@ if __name__ == '__main__':
             webbrowser.open("www.google.com/search?q="+query)
             say("These are some results")
 
+        if "calculate" in query:
+            query = query.replace(" ","")
+            query = query.replace("calculate","")
+            query = query.replace("evaluate","")
+            if 'into' in query:
+                query = query.replace("into","*")
+            if 'by' in query:
+                query = query.replace("by","/")
+            try:
+                result=eval(query)
+            except:
+                result="invalid"
+            print("The result is: ",str(result))
+            say("Result is "+str(result))
+
+
         
