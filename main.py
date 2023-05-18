@@ -67,4 +67,10 @@ if __name__ == '__main__':
                 st = item['title'].split(' - ', 1)[0]
                 print(st)
                 say(st)
+        if "suggest" in query:
+            query = query.replace("suggest", "best")
+            query = query.replace(" ","+")
+            webbrowser.open("www.google.com/search?q="+query)
+            say("These are some results")
+
         
