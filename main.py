@@ -7,6 +7,14 @@ from gnewsclient import gnewsclient
 from playsound import playsound
 import datetime
 client = gnewsclient.NewsClient(language='english',location='india',max_results=3)
+import time
+import wmi
+from selenium import webdriver
+from utils import websites
+import pyjokes
+from urllib.request import urlopen
+import json
+from ecapture import ecapture as ec
 
 def say(text):
     text_to_speech = pyttsx3.init()
@@ -15,18 +23,58 @@ def say(text):
 
 
 def takeCommand():
-    r=sr.Recognizer()
+    r = sr.Recognizer()
     with sr.Microphone() as source:
-        r.pause_threshold = 0.8
+        print("Listening...")
+        r.pause_threshold = 1
         audio = r.listen(source)
-        try:
-            print("Recognizing...")
-            query = r.recognize_google(audio,language="en-in")
-            print(f"User Said: {query}")
-            say(query)
-            return query
-        except Exception as e:
-            return "Some error Occured Sorry from Neom"
+
+    try:
+        print("Recognizing...")    
+        query = r.recognize_google(audio, language='en-in')
+        print(f"User said: {query}\n")
+
+    except Exception as e:
+        print(e)    
+        print("Unable to Recognizing your voice.")  
+        return "None"
+    return query
+
+def takeCommanduser():
+    r = sr.Recognizer()
+    with sr.Microphone() as source:
+        print("Name of User or Group")
+        r.pause_threshold = 1
+        audio = r.listen(source)
+
+    try:
+        query = r.recognize_google(audio, language='en-in')
+        print(f'Client to whome message is to be sent is : {query}\n')
+
+    except Exception as e:
+        print (e)
+        print("Unable to recognize Client name")
+        say("Unable to recognize Client Name")
+        print("Check your Internet Connectivity")
+    return query
+
+def takeCommandmessage():
+    r = sr.Recognizer()
+    with sr.Microphone() as source:
+        print("Enter Your Message")
+        r.pause_threshold = 1
+        audio = r.listen(source)
+
+    try:
+        query = r.recognize_google(audio, language='en-in')
+        print(f'Message to be sent is : {query}\n')
+
+    except Exception as e:
+        print (e)
+        print("Unable to recognize your message")
+        print("Check your Internet Connectivity")
+    return query
+
 
 def wish():
     hour = int(datetime.datetime.now().hour)
@@ -45,7 +93,7 @@ if __name__ == '__main__':
     # say("Hello I am NEOM")
     wish()
     while True:
-        print("Listning...")
+        #print("Listning...")
         query= takeCommand()
         sites=[["youtube","https://www.youtube.com"],["wikipedia","https://www.wikipedia.com"],["google","https://www.google.com"]]
         for site in sites:
@@ -87,6 +135,41 @@ if __name__ == '__main__':
                 result="invalid"
             print("The result is: ",str(result))
             say("Result is "+str(result))
+        
+        if "send a whatsaap message" in query or "send a WhatsApp message" in query:
+            driver = webdriver.Chrome('Web Driver Location')
+            driver.get('https://web.whatsapp.com/')
+            say("Scan QR code before proceding")
+            tim=10
+            time.sleep(tim)
+            say("Enter Name of Group or User")
+            name = takeCommanduser()
+            say("Enter Your Message")
+            msg = takeCommandmessage()
+            count = 1
+            user = driver.find_element_by_xpath('//span[@title = "{}"]'.format(name))
+            user.click()
+            msg_box = driver.find_element_by_class_name('_3u328')
+            for i in range(count):
+                msg_box.send_keys(msg)
+                button = driver.find_element_by_class_name('_3M-N-')
+                button.click()
+        if 'how are you' in query:
+            say("I am fine , Thank you")
+            say("How are you??")
+        
+        if 'joke' in query:
+            say(pyjokes.get_joke())
 
+        if 'is love' in query:
+            say("It is 7th sense that destroy all other senses")
+                
+        if "who are you" in query:
+            say("I am your virtual assistant created by Tyflon")
 
         
+
+        if "bye" in query:
+            print("Adios amigose")
+            say("Adios amigose")
+            exit(0)
