@@ -17,6 +17,9 @@ import json
 from ecapture import ecapture as ec
 import requests
 import getpass
+import pywhatkit as kit
+import os
+import subprocess as sp
 
 def say(text):
     text_to_speech = pyttsx3.init()
@@ -77,6 +80,26 @@ def takeCommandmessage():
         print("Check your Internet Connectivity")
     return query
 
+def find_my_ip():
+    ip_address = requests.get('https://api64.ipify.org?format=json').json()
+    return ip_address["ip"]
+
+def get_random_advice():
+    res = requests.get("https://api.adviceslip.com/advice").json()
+    return res['slip']['advice']
+
+def play_on_youtube(video):
+    kit.playonyt(video)
+
+
+def open_camera():
+    sp.run('start microsoft.windows.camera:', shell=True)
+
+def open_cmd():
+    os.system('start cmd')
+
+def open_calculator():
+    sp.Popen("C:\\Windows\\System32\\calc.exe")
 
 def wish():
     hour = int(datetime.datetime.now().hour)
@@ -136,6 +159,8 @@ if __name__ == '__main__':
             print("The result is: ",str(result))
             say("Result is "+str(result))
         
+
+
         if "send a whatsaap message" in query or "send a WhatsApp message" in query:
             driver = webdriver.Chrome('Web Driver Location')
             driver.get('https://web.whatsapp.com/')
@@ -186,7 +211,81 @@ if __name__ == '__main__':
             say(location)
             webbrowser.open("https://www.google.nl/maps/place/" + location + "")
 
+        if "open camera" in query:
+            open_camera()
+
+
+        if "take a photo" in query:
+            ec.capture(0,"Camera ","img.jpg")
+
+        elif "open calculator" in query:
+            open_calculator()
+
+        elif "open command prompt" in query or "open cmd" in query:
+            open_cmd()
+
         
+        if "write a note" in query:
+            say("What should i write: ")
+            note= takeCommand()
+            file = open('jarvis.txt','w')
+            say("Should i include date and time")
+            snfm = takeCommand()
+            if 'yes' in snfm or 'sure' in snfm:
+                strTime = datetime.datetime.now().strftime("%H:%M:%S")
+                file.write(strTime)
+                file.write(" :- ")
+                file.write(note)
+            else:
+                file.write(note)
+        
+        if "show note" in query:
+            say("Showing Notes")
+            file = open("jarvis.txt", "r") 
+            print(file.read())
+            say(file.read(6))
+
+        if "open notepad".lower() in query.lower():
+                say('opening notepad for you.......')
+                path = ("c:\\windows\\system32\\notepad.exe")
+                os.startfile(path)
+
+        if "close notepad".lower() in query.lower():
+                say('closing notepad wait.....')
+                os.system('c:\\windows\\system32\\taskkill.exe /F /IM notepad.exe')
+
+        if "weather" in query:
+            api_key="8ef61edcf1c576d65d836254e11ea420"
+            base_url="https://api.openweathermap.org/data/2.5/weather?"
+            say("whats the city name")
+            city_name=takeCommand()
+            complete_url=base_url+"appid="+api_key+"&q="+city_name
+            response = requests.get(complete_url)
+            x=response.json()
+            if x["cod"]!="404":
+                y=x["main"]
+                current_temperature = y["temp"]
+                current_humidiy = y["humidity"]
+                z = x["weather"]
+                weather_description = z[0]["description"]
+                say(" Temperature in kelvin unit is " +
+                      str(current_temperature) +
+                      "\n humidity in percentage is " +
+                      str(current_humidiy) +
+                      "\n description  " +
+                      str(weather_description))
+                print(" Temperature in kelvin unit = " +
+                      str(current_temperature) +
+                      "\n humidity (in percentage) = " +
+                      str(current_humidiy) +
+                      "\n description = " +
+                      str(weather_description))
+
+            else:
+                say(" City Not Found ")
+
+        
+
         if "bye" in query:
             print("Adios amigose")
             say("Adios amigose")
