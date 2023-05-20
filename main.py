@@ -20,6 +20,8 @@ import getpass
 import pywhatkit as kit
 import os
 import subprocess as sp
+from config import apikey
+
 
 def say(text):
     text_to_speech = pyttsx3.init()
@@ -101,6 +103,51 @@ def open_cmd():
 def open_calculator():
     sp.Popen("C:\\Windows\\System32\\calc.exe")
 
+def ai(prompt):
+    openai.api_key = apikey
+    text= f"OpenAi response for Prompt: {prompt} \n***************\n"
+
+    response = openai.Completion.create(
+        model="text-davinci-003",
+        prompt=prompt,
+        temperature=0.7,
+        max_tokens=256,
+        top_p=1,
+        frequency_penalty=0,
+        presence_penalty=0
+    )
+    print(response["choices"][0]["text"])
+    text +=response["choices"][0]["text"]
+    if not os.path.exists("Openai"):
+        os.mkdir("Openai")
+
+    # with open(f"Openai/prompt- {random.randint(1,235456455)}","w") as f:
+    with open(f"Openai/{''.join(prompt.split('intelligence')[1:]).strip()}.txt","w") as f:
+        f.write(text)
+
+
+chatStr=""
+def chat(query):
+    global chatStr
+    # print(chatStr)
+    openai.api_key = apikey
+
+    chatStr +=f"Tyflon: {query}\n Neom:"
+    response = openai.Completion.create(
+        model="text-davinci-003",
+        prompt= chatStr,
+        temperature=0.7,
+        max_tokens=256,
+        top_p=1,
+        frequency_penalty=0,
+        presence_penalty=0
+    )
+    say(response["choices"][0]["text"])
+    chatStr += f"{response['choices'][0]['text']}\n"
+    return response["choices"][0]["text"]
+
+
+
 def wish():
     hour = int(datetime.datetime.now().hour)
     if hour>=0 and hour<12:
@@ -132,19 +179,19 @@ if __name__ == '__main__':
             strftime=datetime.datetime.now().strftime("%H:%M:%S") 
             say(f"The time is {strftime}")
 
-        if "news" in query:
+        elif "news" in query:
             news_list = client.get_news()
             for item in news_list:
                 st = item['title'].split(' - ', 1)[0]
                 print(st)
                 say(st)
-        if "suggest" in query:
+        elif "suggest" in query:
             query = query.replace("suggest", "best")
             query = query.replace(" ","+")
             webbrowser.open("www.google.com/search?q="+query)
             say("These are some results")
 
-        if "calculate" in query:
+        elif "calculate" in query:
             query = query.replace(" ","")
             query = query.replace("calculate","")
             query = query.replace("evaluate","")
@@ -161,7 +208,7 @@ if __name__ == '__main__':
         
 
 
-        if "send a whatsaap message" in query or "send a WhatsApp message" in query:
+        elif "send a whatsaap message" in query or "send a WhatsApp message" in query:
             driver = webdriver.Chrome('Web Driver Location')
             driver.get('https://web.whatsapp.com/')
             say("Scan QR code before proceding")
@@ -179,43 +226,43 @@ if __name__ == '__main__':
                 msg_box.send_keys(msg)
                 button = driver.find_element_by_class_name('_3M-N-')
                 button.click()
-        if 'how are you' in query:
+        elif 'how are you' in query:
             say("I am fine , Thank you")
             say("How are you??")
         
-        if 'joke' in query:
+        elif 'joke' in query:
             say(pyjokes.get_joke())
 
-        if 'is love' in query:
+        elif 'is love' in query:
             say("It is 7th sense that destroy all other senses")
                 
-        if "who are you" in query:
+        elif "who are you" in query:
             say("I am your virtual assistant created by Tyflon")
 
-        if "will you be my girlfriend" in query or "will you be my boyfriend" in query:  
+        elif "will you be my girlfriend" in query or "will you be my boyfriend" in query:  
             say("I'm not sure about , may be you should give me some time")
 
-        if "how are you" in query:
+        elif "how are you" in query:
             say("I'm fine, glad you asked me that")
 
-        if "i love you".lower() in query:
+        elif "i love you".lower() in query:
             say("It's hard to understand")
 
-        if "open Gmail" in query:
+        elif "open Gmail" in query:
             webbrowser.open("https://mail.google.com/mail/u/0/#inbox")
         
-        if "where is" in query:
+        elif "where is" in query:
             query=query.replace("where is","")
             location = query
             say("Locating ")
             say(location)
             webbrowser.open("https://www.google.nl/maps/place/" + location + "")
 
-        if "open camera" in query:
+        elif "open camera" in query:
             open_camera()
 
 
-        if "take a photo" in query:
+        elif "take a photo" in query:
             ec.capture(0,"Camera ","img.jpg")
 
         elif "open calculator" in query:
@@ -225,10 +272,10 @@ if __name__ == '__main__':
             open_cmd()
 
         
-        if "write a note" in query:
+        elif "write a note" in query:
             say("What should i write: ")
             note= takeCommand()
-            file = open('jarvis.txt','w')
+            file = open('note.txt','w')
             say("Should i include date and time")
             snfm = takeCommand()
             if 'yes' in snfm or 'sure' in snfm:
@@ -239,22 +286,22 @@ if __name__ == '__main__':
             else:
                 file.write(note)
         
-        if "show note" in query:
+        elif "show note" in query:
             say("Showing Notes")
             file = open("jarvis.txt", "r") 
             print(file.read())
             say(file.read(6))
 
-        if "open notepad".lower() in query.lower():
+        elif "open notepad".lower() in query.lower():
                 say('opening notepad for you.......')
                 path = ("c:\\windows\\system32\\notepad.exe")
                 os.startfile(path)
 
-        if "close notepad".lower() in query.lower():
+        elif "close notepad".lower() in query.lower():
                 say('closing notepad wait.....')
                 os.system('c:\\windows\\system32\\taskkill.exe /F /IM notepad.exe')
 
-        if "weather" in query:
+        elif "weather" in query:
             api_key="8ef61edcf1c576d65d836254e11ea420"
             base_url="https://api.openweathermap.org/data/2.5/weather?"
             say("whats the city name")
@@ -284,9 +331,35 @@ if __name__ == '__main__':
             else:
                 say(" City Not Found ")
 
-        
+        elif "ip address".lower() in query.lower():
+            say("wait")
+            ip_address = find_my_ip()
+            say(f'Your IP Address is {ip_address}.\n For your convenience, I am printing it on the screen.')
+            print(f'Your IP Address is {ip_address}')
 
-        if "bye" in query:
+        elif "advice" in query:
+            say(f"Here's an advice for you")
+            advice = get_random_advice()
+            print(advice)
+            say(advice)
+
+        elif "youtube".lower() in query.lower():
+            say('What do you want to play on Youtube?')
+            video = takeCommand().lower()
+            play_on_youtube(video)
+
+        elif "Using artificial intelligence".lower() in query.lower():
+            ai(prompt=query)
+
+
+        elif "reset chat" in query: 
+            chatStr=""
+
+        
+        elif "bye" in query:
             print("Adios amigose")
             say("Adios amigose")
             exit(0)
+
+        else:
+            chat(query)
