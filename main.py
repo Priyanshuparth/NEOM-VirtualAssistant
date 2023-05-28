@@ -1,3 +1,5 @@
+import warnings
+warnings.filterwarnings("ignore")
 import speech_recognition as sr
 import pyttsx3
 import webbrowser
@@ -10,6 +12,7 @@ client = gnewsclient.NewsClient(language='english',location='india',max_results=
 import time
 import wmi
 from selenium import webdriver
+from selenium.webdriver.common.by import By
 from utils import websites
 import pyjokes
 from urllib.request import urlopen
@@ -22,6 +25,12 @@ import os
 import subprocess as sp
 from config import apikey
 
+from selenium import webdriver
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.by import By
+import time
 
 def say(text):
     text_to_speech = pyttsx3.init()
@@ -166,16 +175,20 @@ if __name__ == '__main__':
     wish()
     while True:
         #print("Listning...")
+        
+        sites=websites.websites_dict
+        m='open '.join(sites.keys())
         query= takeCommand()
-        sites=[["youtube","https://www.youtube.com"],["wikipedia","https://www.wikipedia.com"],["google","https://www.google.com"]]
-        for site in sites:
-            if f"Open {site[0]}".lower() in query.lower():
-                say(f"Opening {site[0]}")
-                webbrowser.open(site[1])
-                # say(query)
+        if query.lower() in m.lower() :
+            
+            for site in sites.keys():
+                if f"Open {site}".lower() in query.lower():
+                    say(f"Opening {site}")
+                    webbrowser.open(str(sites[site]))
+                    # say(query)
         
 
-        if "the time" in query:
+        elif "the time" in query:
             strftime=datetime.datetime.now().strftime("%H:%M:%S") 
             say(f"The time is {strftime}")
 
@@ -209,23 +222,31 @@ if __name__ == '__main__':
 
 
         elif "send a whatsaap message" in query or "send a WhatsApp message" in query:
-            driver = webdriver.Chrome('Web Driver Location')
+            driver = webdriver.Chrome('chrome_driver\chromedriver.exe')
             driver.get('https://web.whatsapp.com/')
+            wait = WebDriverWait(driver, 600)
             say("Scan QR code before proceding")
             tim=10
             time.sleep(tim)
             say("Enter Name of Group or User")
-            name = takeCommanduser()
+            # name = takeCommanduser()
+            name="My notes"
             say("Enter Your Message")
-            msg = takeCommandmessage()
-            count = 1
-            user = driver.find_element_by_xpath('//span[@title = "{}"]'.format(name))
-            user.click()
-            msg_box = driver.find_element_by_class_name('_3u328')
-            for i in range(count):
-                msg_box.send_keys(msg)
-                button = driver.find_element_by_class_name('_3M-N-')
-                button.click()
+            # msg = takeCommandmessage()
+            msg="Hello"
+
+            x_arg = '//span[contains(@title,' + name + ')]'
+            group_title = wait.until(EC.presence_of_element_located((By.XPATH, x_arg)))
+            group_title.click()
+            inp_xpath = '//div[@class="_13NKt copyable-text selectable-text"][@data-tab="9"]'
+            input_box = wait.until(EC.presence_of_element_located((By.XPATH, inp_xpath)))
+            for i in range(100):
+                input_box.send_keys(msg + Keys.ENTER)
+                time.sleep(1)
+
+
+
+
         elif 'how are you' in query:
             say("I am fine , Thank you")
             say("How are you??")
